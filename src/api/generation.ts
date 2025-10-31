@@ -11,6 +11,12 @@ export interface GenerationItem {
   createdAt: string
   finishedAt?: string
   progress?: number
+  // source info
+  url?: string
+  sourceType?: 'url' | 'image'
+  imagePath?: string
+  imageName?: string
+  imageMime?: string
 }
 export interface GenerationDetail extends GenerationItem {
   steps?: { name: string; status: GenStatus | 'skipped'; durationMs?: number; error?: string }[]
@@ -31,10 +37,14 @@ export async function createGeneration(data: { url?: string; image?: any }): Pro
       const formData: any = new FormData()
       formData.append('file', (data as any).image)
       if (data?.url) formData.append('url', data.url)
-      // 直接用 fetch 兜底（保持与后端一致路径）
+      // 手动附加 Authorization（fetch 不走 http 封装）
+      const { getAccessToken } = await import('@/utils/token')
+      const token = getAccessToken()
+      const headers: any = { }
+      if (token) headers['Authorization'] = `Bearer ${token}`
       const res = await fetch(buildUrl('/generation'), {
         method: 'POST',
-        headers: { /* uni.request 的 token 已在 http 封装，这里简化占位，不附加 */ },
+        headers,
         body: formData as any,
       })
       const body = await res.json()

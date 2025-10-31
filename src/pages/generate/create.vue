@@ -1,5 +1,8 @@
 <template>
   <view class="page">
+    <view class="nav">
+      <text class="nav-link" @tap="goList">查看任务列表</text>
+    </view>
     <view class="form">
       <view class="label">链接 URL（可选）</view>
       <uni-easyinput v-model="url" placeholder="https://example.com/article" :placeholderStyle="'color:#C7C7CC'" />
@@ -26,6 +29,8 @@ import { GenerationApi } from '@/api'
 const url = ref('')
 const imageFile = ref<any | null>(null)
 const submitting = ref(false)
+
+function goList() { uni.navigateTo({ url: '/pages/generate/list' }) }
 
 function onSelect(e: any) {
   // H5 下 e.tempFiles[0].file 为 File 对象
@@ -54,6 +59,8 @@ async function onSubmit() {
 
 <style scoped lang="scss">
 .page { background: $bg-primary; min-height: 100vh; }
+.nav { display: flex; justify-content: flex-end; padding: 16rpx 24rpx 0; }
+.nav-link { color: $primary-color; font-size: 26rpx; }
 .form { padding: 24rpx; display: flex; flex-direction: column; gap: 16rpx; }
 .label { color: #000; font-weight: 600; font-size: 28rpx; margin-top: 8rpx; }
 .sep { height: 12rpx; }

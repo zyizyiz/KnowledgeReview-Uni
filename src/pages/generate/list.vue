@@ -5,6 +5,11 @@
         <view v-for="it in list" :key="it.id" class="row" @tap="goDetail(it)">
           <view class="left">
             <view class="title">{{ it.title || ('任务 ' + it.id.slice(-6)) }}</view>
+            <view class="source" v-if="it.url || it.imageName">
+              <text class="src-label">来源：</text>
+              <text v-if="it.url" class="src-url">{{ it.url }}</text>
+              <text v-else-if="it.imageName" class="src-img">图片 - {{ it.imageName }}</text>
+            </view>
             <view class="meta">{{ formatTime(it.createdAt) }}</view>
           </view>
           <view class="right">
@@ -47,8 +52,12 @@ function goDetail(it: any) { uni.navigateTo({ url: `/pages/generate/detail?id=${
 <style scoped lang="scss">
 .page { background: $bg-primary; min-height: 100vh; }
 .row { display: flex; align-items: center; justify-content: space-between; padding: 20rpx 24rpx; border-bottom: 1rpx solid $separator; }
-.left { display: flex; flex-direction: column; gap: 6rpx; }
+.left { display: flex; flex-direction: column; gap: 6rpx; width: 80%; }
 .title { color: #000; font-size: 30rpx; font-weight: 600; }
+.source { color: $text-secondary; font-size: 24rpx; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.src-label { color: $text-secondary; margin-right: 8rpx; }
+.src-url { color: $primary-color; }
+.src-img { color: $text-secondary; }
 .meta { color: $text-secondary; font-size: 24rpx; }
 .right { display: flex; align-items: center; }
 .empty { text-align: center; color: $text-secondary; padding: 80rpx 0; }

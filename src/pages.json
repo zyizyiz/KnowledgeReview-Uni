@@ -1,6 +1,14 @@
 {
 	"pages": [
 		{
+			"path": "pages/knowledge-base/index",
+			"style": {
+				"navigationBarTitleText": "知识库",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "KnowledgeReview",

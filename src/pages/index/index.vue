@@ -4,6 +4,10 @@
       <image class="logo" src="@/static/logo.png" mode="aspectFill" />
       <view class="title">KnowledgeReview</view>
       <view class="subtitle">今天待复习 {{ todayCount }}</view>
+      <view class="kb-bar">
+        <text>当前知识库：{{ kbTitle || '未选择' }}</text>
+        <button size="mini" @click="switchKb">切换</button>
+      </view>
     </view>
 
     <uni-grid :column="2" :border="false" class="grid">
@@ -20,8 +24,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ReviewApi } from '@/api'
+import { getCurrentKb } from '@/api/knowledge-base'
 
 const todayCount = ref(0)
+const kbTitle = ref<string>('')
 const entries = ref([
   { title: '背题模式', path: '/pages/study/flashcards', icon: 'sound' },
   { title: '问答模式', path: '/pages/qa/quiz', icon: 'compose' },
@@ -32,6 +38,12 @@ const entries = ref([
 ])
 
 onMounted(async () => {
+  const cur = getCurrentKb()
+  if (!cur.id) {
+    try { uni.reLaunch({ url: '/pages/knowledge-base/index' }) } catch {}
+    return
+  }
+  kbTitle.value = cur.title || cur.id
   try {
     const plan = await ReviewApi.getReviewPlan()
     const sum = (plan?.items || []).reduce((a: number, b: any) => a + (b.count || 0), 0)
@@ -39,6 +51,7 @@ onMounted(async () => {
   } catch {}
 })
 
+function switchKb() { uni.navigateTo({ url: '/pages/knowledge-base/index' }) }
 function go(path: string) { uni.navigateTo({ url: path }) }
 </script>
 

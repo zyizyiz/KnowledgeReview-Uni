@@ -90,6 +90,8 @@ export async function request<TRes = any, TReq = any>(options: RequestOptions<TR
   };
   const token = getAccessToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
+  const kbId = typeof uni !== 'undefined' ? uni.getStorageSync('currentKnowledgeBaseId') : null;
+  if (kbId) headers['X-Knowledge-Base-Id'] = kbId;
 
   try {
     const res = await uniRequest<ApiEnvelope<TRes>>({
@@ -114,8 +116,12 @@ export async function request<TRes = any, TReq = any>(options: RequestOptions<TR
 
     if (res.statusCode >= 400) {
       const msg = (res.data as any)?.message || `HTTP ${res.statusCode}`;
-      uni.showToast({ title: typeof msg === 'string' ? msg : '请求失败', icon: 'none' });
-      throw new Error(typeof msg === 'string' ? msg : 'request error');
+      const text = typeof msg === 'string' ? msg : '请求失败';
+      uni.showToast({ title: text, icon: 'none' });
+      if (res.statusCode === 400 && String(text).includes('X-Knowledge-Base-Id')) {
+        setTimeout(() => { try { uni.navigateTo({ url: '/pages/knowledge-base/index' }); } catch {} }, 500);
+      }
+      throw new Error(text);
     }
 
     const body = res.data;

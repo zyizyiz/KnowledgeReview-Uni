@@ -8,6 +8,12 @@
     :loading-more-enabled="enableLoadMore"
     @query="onQuery"
   >
+
+    <!-- 可以将自定义导航栏、tab-view等需要固定的(不需要跟着滚动的)元素放入slot="top"的view中。 -->
+    <template #top>
+      <slot name="top"></slot> 
+    </template>
+
     <!-- 列表项渲染插槽 -->
     <template #default>
       <slot name="default" :list="dataList"></slot>

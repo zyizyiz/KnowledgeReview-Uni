@@ -36,7 +36,7 @@ function joinUrl(url: string) {
 // helper for other modules (e.g., upload)
 export function buildUrl(url: string) { return joinUrl(url); }
 
-function uniRequest<T>(opts: UniApp.RequestOptions): Promise<UniApp.RequestSuccessCallbackResult<T>> {
+function uniRequest<T>(opts: UniApp.RequestOptions): Promise<UniApp.RequestSuccessCallbackResult> {
   return new Promise((resolve, reject) => {
     uni.request({
       ...opts,
@@ -62,8 +62,8 @@ async function doRefreshToken(): Promise<boolean> {
       data: { refreshToken: rt },
       timeout: 10000,
     });
-    const body = res.data;
-    if (body && (body as any).success && body.data) {
+    const body: any = res.data as any;
+    if (body && body.success && body.data) {
       setTokens(body.data.accessToken, body.data.refreshToken);
       return true;
     }

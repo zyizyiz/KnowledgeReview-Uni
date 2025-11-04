@@ -11,7 +11,7 @@
 
         <view class="options">
           <label class="remember">
-            <switch :checked="remember" @change="remember = $event.detail.value" />
+            <switch :checked="remember" @change="remember = ($event as any).detail.value" />
             <text class="remember-text">记住我</text>
           </label>
         </view>

@@ -1,4 +1,4 @@
-import { http, buildUrl } from './request';
+import { http } from './request';
 
 export interface PageQuery { page: number; pageSize: number; [key: string]: any }
 export interface PageResult<T> { list: T[]; total: number }
@@ -11,51 +11,54 @@ export interface GenerationItem {
   createdAt: string
   finishedAt?: string
   progress?: number
-  // source info
-  url?: string
-  sourceType?: 'url' | 'image'
-  imagePath?: string
-  imageName?: string
-  imageMime?: string
+  knowledgeBaseId?: string
 }
 export interface GenerationDetail extends GenerationItem {
   steps?: { name: string; status: GenStatus | 'skipped'; durationMs?: number; error?: string }[]
   error?: string
 }
 
+// 背题模式：知识点列表
+export interface ReciteItem {
+  id: string
+  title?: string
+  createdAt: string
+  question: string
+  answer: string
+  tags?: string[]
+  quality?: { score: number; label: string }
+  memory?: { mnemonic?: string; story?: string }
+  audio?: { url?: string | null; durationSec?: number }
+}
+
+export async function listRecite(query: PageQuery & { keyword?: string; tags?: string[] }) {
+  return http.get<PageResult<ReciteItem>>('/generation/recite', query)
+}
+
+export async function getAudioUrl(id: string): Promise<{ ok: boolean; url: string }> {
+  return http.get(`/generation/${id}/audio`)
+}
+
 // 示例：生成任务分页列表（占位，与后端接口约定保持一致）
 export async function listGenerations<T = GenerationItem>(query: PageQuery) {
-  // 约定后端 GET /generation?page=&pageSize= 返回 { success, data: { list, total } }
   return http.get<PageResult<T>>('/generation', query);
 }
 
-// 创建生成任务（支持 URL 或 图片）— 无后端时返回 mock
-export async function createGeneration(data: { url?: string; image?: any }): Promise<{ id: string } | any> {
-  try {
-    if (data?.image) {
-      // H5 下 image 可能为 File 对象或临时路径，优先尝试表单上传
-      const formData: any = new FormData()
-      formData.append('file', (data as any).image)
-      if (data?.url) formData.append('url', data.url)
-      // 手动附加 Authorization（fetch 不走 http 封装）
-      const { getAccessToken } = await import('@/utils/token')
-      const token = getAccessToken()
-      const headers: any = { }
-      if (token) headers['Authorization'] = `Bearer ${token}`
-      const res = await fetch(buildUrl('/generation'), {
-        method: 'POST',
-        headers,
-        body: formData as any,
-      })
-      const body = await res.json()
-      return (body as any)?.data || body
-    }
-    // 仅 URL
-    return await http.post('/generation', { url: data?.url })
-  } catch (e) {
-    // 占位：返回 mock，便于前端流程联调
-    return Promise.resolve({ id: 'gen_mock_' + Date.now() })
+// 创建生成任务（支持 question+answer 或 questionData）
+export async function createGeneration(data: { title?: string; question?: string; answer?: string; questionData?: any }): Promise<any> {
+  const payload: any = {}
+  if (data?.questionData && typeof data.questionData === 'object') {
+    payload.title = data.title
+    payload.questionData = data.questionData
+  } else {
+    const q = String(data?.question || '').trim()
+    const a = String(data?.answer || '').trim()
+    if (!q || !a) throw new Error('请填写题目与答案')
+    payload.title = data.title
+    payload.question = q
+    payload.answer = a
   }
+  return http.post('/generation', payload)
 }
 
 // 获取任务详情—无后端时返回 mock

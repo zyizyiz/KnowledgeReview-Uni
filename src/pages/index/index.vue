@@ -29,8 +29,8 @@ import { getCurrentKb } from '@/api/knowledge-base'
 const todayCount = ref(0)
 const kbTitle = ref<string>('')
 const entries = ref([
-  { title: '背题模式', path: '/pages/study/flashcards', icon: 'sound' },
-  { title: '问答模式', path: '/pages/qa/quiz', icon: 'compose' },
+  { title: '背题模式', path: '/pages/recite/index', icon: 'sound' },
+  { title: '练习题库', path: '/pages/practice/list', icon: 'compose' },
   { title: '复习计划', path: '/pages/review/plan', icon: 'calendar' },
   { title: '生成任务', path: '/pages/generate/create', icon: 'upload' },
   { title: '统计总览', path: '/pages/stats/overview', icon: 'list' },

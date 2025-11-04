@@ -49,6 +49,14 @@
 			}
 		},
 		{
+			"path": "pages/recite/index",
+			"style": {
+				"navigationBarTitleText": "背题模式",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
 			"path": "pages/qa/quiz",
 			"style": {
 				"navigationBarTitleText": "问答模式",
@@ -92,6 +100,22 @@
 			"path": "pages/generate/detail",
 			"style": {
 				"navigationBarTitleText": "任务详情",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/practice/list",
+			"style": {
+				"navigationBarTitleText": "练习题库",
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/practice/detail",
+			"style": {
+				"navigationBarTitleText": "练习答题",
 				"navigationBarBackgroundColor": "#FFFFFF",
 				"navigationBarTextStyle": "black"
 			}

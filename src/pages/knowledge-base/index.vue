@@ -2,7 +2,7 @@
   <view class="page">
     <view class="header">
       <text class="title">知识库</text>
-      <button class="create-btn" type="primary" size="mini" @click="onCreate">新建</button>
+      <button class="create-btn primary" size="mini" @click="onCreate">新建</button>
     </view>
 
     <view v-if="loading" class="hint">加载中...</view>
@@ -16,7 +16,7 @@
         </view>
         <view class="kb-actions">
           <button size="mini" @click.stop="onRename(kb)">重命名</button>
-          <button size="mini" type="warn" @click.stop="onDelete(kb)">删除</button>
+          <button size="mini" class="warn" @click.stop="onDelete(kb)">删除</button>
         </view>
       </view>
     </view>

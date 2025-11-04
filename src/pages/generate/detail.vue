@@ -11,22 +11,26 @@
       </view>
 
       <view v-if="detail.error" class="error">错误：{{ detail.error }}</view>
+      <view class="section" v-if="originalAnswers && originalAnswers.length">
+        <view class="section-title">原始答案</view>
+        <view class="ans-list">
+          <view v-for="(a, i) in originalAnswers" :key="i" class="ans-item">{{ a }}</view>
+        </view>
+      </view>
 
-      <view class="section">
+
+      <view class="section" v-if="fusedAnswer">
+        <view class="section-title">融合答案</view>
+        <view class="answer">{{ fusedAnswer }}</view>
+      </view>
+
+      <view class="section" v-if="sources && sources.length">
         <view class="section-title">来源</view>
-        <view class="source">
-          <template v-if="detail.url">
-            <text class="src-label">链接：</text>
-            <text class="src-url" @tap="copy(detail.url)">{{ detail.url }}</text>
-            <button class="link-btn" @tap="openUrl(detail.url)">打开</button>
-          </template>
-          <template v-else-if="detail.imageName">
-            <text class="src-label">图片：</text>
-            <text class="src-img">{{ detail.imageName }}</text>
-          </template>
-          <template v-else>
-            <text class="src-none">无</text>
-          </template>
+        <view class="source-list">
+          <view v-for="(s, i) in sources" :key="i" class="src-item">
+            <text class="src-index">{{ i+1 }}.</text>
+            <text class="src-url" @tap="openUrl(s.url)">{{ s.url }}</text>
+          </view>
         </view>
       </view>
 
@@ -49,11 +53,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { GenerationApi } from '@/api'
 
 const detail = ref<any>(null)
+
+const fusedAnswer = computed(() => {
+  const d = detail.value
+  if (!d) return ''
+  if (d.finalAnswer) return d.finalAnswer
+  const s = Array.isArray(d.steps) ? d.steps.find((x: any) => String(x?.name || '').includes('答案匹配')) : null
+  return s?.output?.fusedAnswer || ''
+})
+const sources = computed<any[]>(() => {
+  const d = detail.value
+  if (!d) return []
+  if (Array.isArray(d.answerSources)) return d.answerSources
+  const s = Array.isArray(d.steps) ? d.steps.find((x: any) => String(x?.name || '').includes('答案匹配')) : null
+  const arr = s?.output?.sources
+  return Array.isArray(arr) ? arr : []
+})
+const originalAnswers = computed<string[]>(() => {
+  const d = detail.value
+  if (!d) return []
+  const top = d.originalAnswer
+  if (Array.isArray(top)) return top.map((x: any) => String(x))
+  const s = Array.isArray(d.steps) ? d.steps.find((x: any) => String(x?.name || '').includes('答案匹配')) : null
+  const arr = s?.output?.originalAnswer
+  if (Array.isArray(arr)) return arr.map((x: any) => String(x))
+  if (typeof arr === 'string') return [arr]
+  return []
+})
 
 onLoad(async (opts: any) => {
   const id = opts?.id
@@ -99,11 +130,13 @@ function openUrl(url: string) {
 .meta { color: $text-secondary; font-size: 24rpx; }
 .section { margin-top: 16rpx; }
 .section-title { color: #000; font-size: 28rpx; font-weight: 600; margin-bottom: 12rpx; }
-.source { color: $text-secondary; font-size: 24rpx; display: flex; align-items: center; gap: 12rpx; flex-wrap: wrap; }
-.src-label { color: $text-secondary; }
+.answer { white-space: pre-wrap; color: #1C1C1E; font-size: 28rpx; line-height: 1.6; }
+.source-list { display: flex; flex-direction: column; gap: 8rpx; }
+.src-item { display: flex; gap: 8rpx; align-items: flex-start; }
+.src-index { color: $text-secondary; font-size: 24rpx; }
 .src-url { color: $primary-color; word-break: break-all; }
-.src-img { color: $text-secondary; }
-.src-none { color: $text-secondary; }
+.ans-list { display: flex; flex-direction: column; gap: 8rpx; }
+.ans-item { color: #1C1C1E; font-size: 28rpx; }
 .link-btn { height: 60rpx; line-height: 60rpx; padding: 0 16rpx; border: 2rpx solid $primary-color; background: transparent; color: $primary-color; border-radius: 12rpx; font-size: 24rpx; }
 .step { display: flex; align-items: center; gap: 12rpx; padding: 14rpx 0; border-bottom: 1rpx solid $separator; }
 .step-name { color: #1C1C1E; font-size: 28rpx; flex: 1; }

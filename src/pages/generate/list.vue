@@ -5,11 +5,6 @@
         <view v-for="it in list" :key="it.id" class="row" @tap="goDetail(it)">
           <view class="left">
             <view class="title">{{ it.title || ('任务 ' + it.id.slice(-6)) }}</view>
-            <view class="source" v-if="it.url || it.imageName">
-              <text class="src-label">来源：</text>
-              <text v-if="it.url" class="src-url">{{ it.url }}</text>
-              <text v-else-if="it.imageName" class="src-img">图片 - {{ it.imageName }}</text>
-            </view>
             <view class="meta">{{ formatTime(it.createdAt) }}</view>
           </view>
           <view class="right">
